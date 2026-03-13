@@ -12,16 +12,16 @@ body:
   - type: input
     id: name
     attributes:
-      label: "Repository Name"
+      label: GITHUBACTIONCOOKBOOK2
       description: "Enter the repository name in lower-case and kebab-case."
-      placeholder: "your-name-kebab"
+      placeholder: cookbook2
     validations:
       required: true
 
   - type: dropdown
     id: department
     attributes:
-      label: "Department"
+      label: Department
       description: "Pick your department. It will be used as a prefix for the repository name."
       options:
         - dep1
