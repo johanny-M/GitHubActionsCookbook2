@@ -22,38 +22,29 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Extract data from issue form
-          repo_name=$(echo '${{ steps.parse.outputs.data }}' | jq -r '.name.text')
-          repo_dept=$(echo '${{ steps.parse.outputs.data }}' | jq -r '.department.text')
-          repo_full_name="$repo_dept-$repo_name"
-          echo "REPO_NAME=$repo_full_name" >> "$GITHUB_OUTPUT"
+            repo_name=$(echo "${{ steps.parse.outputs.data }}" | jq -r '.name.text')
+            repo_dept=$(echo "${{ steps.parse.outputs.data }}" | jq -r '.department.text')
+            repo_full_name="$repo_dept-$repo_name"
+            echo "REPO_NAME=$repo_full_name" >> "$GITHUB_OUTPUT"
 
-          # Prepare message
-          mention="@${{ github.event.issue.user.login }}: "
-          message="Requested repository '$repo_full_name' will be sent for approval."
-          exitcode=0
+            mention="@${{ github.event.issue.user.login }}: "
+            message="Requested repository '$repo_full_name' will be sent for approval."
+            exitcode=0
 
-          # Validate not empty
-          if [ -z "$repo_full_name" ]; then
-            message="Repository name is empty."
-            exitcode=1
-          fi
+            if [ -z "$repo_full_name" ]; then
+                message="Repository name is empty."
+                exitcode=1
+            fi
 
-          # Validate alphanumeric and minus only
-          if [[ "$repo_full_name" =~ [^a-zA-Z0-9-] ]]; then
-            message="Repository name shall be alphanumeric and minus only."
-            exitcode=1
-          fi
+            if [[ "$repo_full_name" =~ [^a-zA-Z0-9-] ]]; then
+                message="Repository name shall be alphanumeric and minus only."
+                exitcode=1
+            fi
 
-          # If invalid, remove label and update message
-          if [ $exitcode -ne 0 ]; then
-            gh issue edit "${{ github.event.issue.number }}" \
-              --remove-label repo-request
-            message="$message Please fix the issue and try again by applying the label 'repo-request' again to the issue."
-          fi
+            if [ $exitcode -ne 0 ]; then
+                gh issue edit "${{ github.event.issue.number }}" --remove-label repo-request
+                message="$message Please fix the issue and try again by applying the label 'repo-request' again."
+            fi
 
-          # Comment on issue
-          gh issue comment "${{ github.event.issue.number }}" "$mention $message" \
-            --repo "${{ github.event.repository.full_name }}"
-
-          exit $exitcode
+            gh issue comment "${{ github.event.issue.number }}" "$mention $message" --repo "${{ github.event.repository.full_name }}"
+            exit $exitcode
