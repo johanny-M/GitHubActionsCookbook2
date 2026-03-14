@@ -21,7 +21,7 @@ jobs:
         run: |
             repo_name=$(echo '${{ steps.parse.outputs.data }}' | jq -r '.name.text')
             repo_dept=$(echo '${{ steps.parse.outputs.data }}' | jq -r '.department.text')
-            repo_full_name="$repo_dept-$repo_name"
+            repo_full_name=$repo_dept-$repo_name
             echo "REPO_NAME=$repo_full_name" >> "$GITHUB_OUTPUT"
   repo-deletion:
      name: "Delete a repository"
